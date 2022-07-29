@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<error-handler name="common-error-handler" doc:id="33d41e75-f44b-4ca1-8427-7eb2d04e9803" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c3dd8e1d-be56-4fd4-86aa-3686ef4b557c" type="HTTP:BAD_REQUEST">
+			<ee:transform doc:name="Transform Message" doc:id="7f0ed286-e916-4e6d-a442-17cceb60450b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorDescription:error.description,
+	errorDetailedDesc : error.detailedDescription,
+	errorType:error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="cc0629da-4834-405c-8660-0acbd95263df" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+html:{
+    body : {
+    table @(border:1):{
+        tr: payload mapObject ((value, key, index) -> {"th": key}),
+        tr: payload  mapObject (value,key,index) ->   {"td" : value} 
+        }
+    }}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Ref: salesforce-prc-apiSub_Flow" doc:id="b4664fd8-b78e-46f9-bf5c-ec28e82fde06" name="salesforce-prc-apiSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c955dcca-fad3-45da-b8c3-588d7d785713" type=" HTTP:INTERNAL_SERVER_ERROR">
+			<jms:publish doc:name="Publish" doc:id="3044d30c-d255-4551-b51d-c77ddce43ce2" config-ref="JMS_Config" destination="netsuite-salesforce-deadletter-Queue">
+				<jms:message >
+					<jms:body ><![CDATA[#[vars.reprocess]]]></jms:body>
+				</jms:message>
+			</jms:publish>
+			<ee:transform doc:name="Transform Message" doc:id="e3ea79a7-1001-42ba-91c9-9775a5cbf3fc" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorDescription:error.description,
+	errorDetailedDesc : error.detailedDescription,
+	errorType:error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="f6849cc0-b6cb-4f6d-91d1-23b385e3b054" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+html:{
+    body : {
+    table @(border:1):{
+        tr: payload mapObject ((value, key, index) -> {"th": key}),
+        tr: payload  mapObject (value,key,index) ->   {"td" : value} 
+        }
+    }}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Ref: salesforce-prc-apiSub_Flow" doc:id="6fc004c0-417e-4c9e-8bf5-d2532845c98b" name="salesforce-prc-apiSub_Flow"/>
+
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2c553a6f-f382-4520-946d-3a130911e2cc" type="HTTP:NOT_FOUND">
+			<ee:transform doc:name="Transform Message" doc:id="71392649-643e-4a87-a06c-83993bd2a0f2">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorDescription:error.description,
+	errorDetailedDesc : error.detailedDescription,
+	errorType:error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="ac56ba90-75ff-4b46-ab75-8cc89b420dc2" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+html:{
+    body : {
+    table @(border:1):{
+        tr: payload mapObject ((value, key, index) -> {"th": key}),
+        tr: payload  mapObject (value,key,index) ->   {"td" : value} 
+        }
+    }}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Ref: salesforce-prc-apiSub_Flow" doc:id="a9fcb2d0-eb9b-48da-b43b-053fb0cd3e48" name="salesforce-prc-apiSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0a0b5b2a-31b6-4357-a7ac-c2d69a8b6ad3" type="HTTP:METHOD_NOT_ALLOWED">
+			<ee:transform doc:name="Transform Message" doc:id="c4d4a777-e74d-4073-a9ff-1054c5e267f5">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorDescription:error.description,
+	errorDetailedDesc : error.detailedDescription,
+	errorType:error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="77cc3beb-b633-48e2-8379-fa2417681d57" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+html:{
+    body : {
+    table @(border:1):{
+        tr: payload mapObject ((value, key, index) -> {"th": key}),
+        tr: payload  mapObject (value,key,index) ->   {"td" : value} 
+        }
+    }}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Ref: salesforce-prc-apiSub_Flow" doc:id="1f0fb668-6c6a-42ba-9204-74cd72e0e0f4" name="salesforce-prc-apiSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d950c6dd-9eff-42f6-bbb0-7ae76d48b121" type="HTTP:FORBIDDEN">
+			<ee:transform doc:name="Transform Message" doc:id="e2e2d361-1f9f-4ee6-a972-e8f0a014a796">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorDescription:error.description,
+	errorDetailedDesc : error.detailedDescription,
+	errorType:error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[403]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="327c6e40-6549-4921-92a2-8fa2892fe3e3" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+html:{
+    body : {
+    table @(border:1):{
+        tr: payload mapObject ((value, key, index) -> {"th": key}),
+        tr: payload  mapObject (value,key,index) ->   {"td" : value} 
+        }
+    }}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Ref: salesforce-prc-apiSub_Flow" doc:id="725b82aa-c78c-4d60-8a97-da9c4f494c1e" name="salesforce-prc-apiSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="59a1d6d5-2104-4bc7-b77a-4712c723aa2c" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="4cedad77-58ed-4b87-957c-742153f776a5">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorDescription:error.description,
+	errorDetailedDesc : error.detailedDescription,
+	errorType:error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="d60ad3ae-c89a-4350-b0d5-25a77873bca1" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+html:{
+    body : {
+    table @(border:1):{
+        tr: payload mapObject ((value, key, index) -> {"th": key}),
+        tr: payload  mapObject (value,key,index) ->   {"td" : value} 
+        }
+    }}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Ref: salesforce-prc-apiSub_Flow" doc:id="d7342a58-c8b2-48d9-94a7-602f90417aee" name="salesforce-prc-apiSub_Flow"/>
+		
+</on-error-propagate>
+	</error-handler>
+	
+	</mule>

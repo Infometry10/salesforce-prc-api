@@ -1,0 +1,27 @@
+salesforce.sys.api:
+  host: "salesforce-sys-dev-api.us-e2.cloudhub.io"
+  port: "80"
+  basePath: "api"
+  client_secret: "![hU4Ya8aKrSKp53JEm3A7Ks5abidKC811814fNYZ/fxHAqJzxp4KbHXjNC0JT1tWr]"
+  client_id: "![FYAw09kZxJvBAqffMOi11RCYPhqFceyUFhFvM6IXsVpSQd/vXUohlRfSX2evBu8o]"
+  
+  
+https:
+  port: "8083"
+  
+  
+jms:
+  username: "admin"
+  password: "![rFJ9EGpxIStsLCMcEiECgA==]"
+  broker_url: "tcp://localhost:61616"
+  client_id: "netsuite-salesforce"
+  destination: "T-nestsuite-salesforce-intg"
+  subscription_name: "netsuite-salesforce-subscriber"
+  
+smtp:
+  password: "![lU0SbuFAO55ODoiDxjkaBA==]"
+  fromAddress: "![zMxrVNPS84OBVA5bRJ2DymVTwHCB7Hqe1bPgOows4wQ=]"
+  toAddress: "![PwSyz0w7owJslImkJodpzOhcA6rqT0nDjyuFKIztH+4=]"
+  host: "smtp.ipage.com"
+  port: "587"
+  user: "prathamesh.kadam@infometry.net"

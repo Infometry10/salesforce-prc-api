@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<flow name="reprocess-failed-recordsFlow" doc:id="fc5572da-3906-4db8-87ea-2e5af9be1230" >
+		<http:listener doc:name="/reprocess" doc:id="976a961f-5d78-4a6a-8db0-ffcf6f70dfeb" config-ref="HTTP_Listener_config" path="/reprocess"/>
+		<jms:consume doc:name="Consume" doc:id="629c18fa-2e39-4cad-9ea4-a0d03c646a08" config-ref="JMS_Config" destination="netsuite-salesforce-deadletter-Queue" ackMode="IMMEDIATE">
+			<jms:consumer-type >
+				<jms:queue-consumer />
+			</jms:consumer-type>
+		</jms:consume>
+		<jms:publish doc:name="Publish" doc:id="e78a8d77-bafc-47a9-9598-c9b18eecc492" config-ref="JMS_Config" destination="T-nestsuite-salesforce-intg" destinationType="TOPIC"/>
+	</flow>
+</mule>
